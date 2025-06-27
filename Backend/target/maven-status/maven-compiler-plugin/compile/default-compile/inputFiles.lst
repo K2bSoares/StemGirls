@@ -1,0 +1,12 @@
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\config\AuthTokenFilter.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\config\JwtUtils.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\config\SecurityConfig.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\controllers\AuthController.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\dtos\JwtResponse.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\dtos\LoginRequest.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\dtos\SignUpRequest.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\FemmcodeApplication.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\models\UsuarioModel.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\repositories\UsuarioRepository.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\services\AuthService.java
+C:\Users\Jefferson.Almeida\Documents\Femmcode\femmcode-backend\src\main\java\com\br\femmcode\femmcode\WebConfig.java

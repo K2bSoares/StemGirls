@@ -21,10 +21,64 @@ function Login() {
         senha: ''
     });
 
-    // Handler para atualizar o estado do formulário de CADASTRO
+    // --- NOVOS ESTADOS PARA VALIDAÇÃO DA SENHA ---
+    const [passwordError, setPasswordError] = useState('');
+    const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+    // --- NOVA FUNÇÃO PARA VALIDAR A SENHA ---
+    const validatePassword = (senha) => {
+        // Critérios de senha forte
+        const minLength = 8;
+        const hasUpperCase = /[A-Z]/.test(senha);
+        const hasLowerCase = /[a-z]/.test(senha);
+        const hasNumber = /[0-9]/.test(senha);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(senha);
+
+        if (!senha) {
+            setPasswordError('');
+            setIsPasswordValid(false);
+            return;
+        }
+        if (senha.length < minLength) {
+            setPasswordError('A senha deve ter no mínimo 8 caracteres.');
+            setIsPasswordValid(false);
+            return;
+        }
+        if (!hasLowerCase) {
+            setPasswordError('Inclua pelo menos uma letra minúscula (a-z).');
+            setIsPasswordValid(false);
+            return;
+        }
+        if (!hasUpperCase) {
+            setPasswordError('Inclua pelo menos uma letra maiúscula (A-Z).');
+            setIsPasswordValid(false);
+            return;
+        }
+        if (!hasNumber) {
+            setPasswordError('Inclua pelo menos um número (0-9).');
+            setIsPasswordValid(false);
+            return;
+        }
+        if (!hasSpecialChar) {
+            setPasswordError('Inclua pelo menos um caractere especial (ex: !@#$).');
+            setIsPasswordValid(false);
+            return;
+        }
+
+        // Se passar por todas as regras
+        setPasswordError('Senha forte!');
+        setIsPasswordValid(true);
+    };
+
+    // Handler para atualizar o estado do formulário de CADASTRO (MODIFICADO)
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
+
+        // Valida a senha em tempo real
+        if (name === 'senha') {
+            validatePassword(value);
+        }
     };
 
     // Handler para atualizar o estado do formulário de LOGIN
@@ -33,9 +87,16 @@ function Login() {
         setLoginForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    // --- FUNÇÃO DE SUBMISSÃO DO CADASTRO ---
+    // --- FUNÇÃO DE SUBMISSÃO DO CADASTRO (MODIFICADO) ---
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
+
+        // Bloqueia o envio se a senha não for válida
+        if (!isPasswordValid) {
+            alert('Por favor, crie uma senha que atenda a todos os critérios de segurança.');
+            return; // Impede o envio do formulário
+        }
+
         try {
             const response = await axios.post("http://localhost:8080/api/auth/register", {
                 nomeCompleto: form.nomeCompleto,
@@ -52,20 +113,20 @@ function Login() {
         }
     };
 
-    // --- FUNÇÃO DE SUBMISSÃO DO LOGIN (NOME CORRIGIDO) ---
+    // --- FUNÇÃO DE SUBMISSÃO DO LOGIN ---
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post("http://localhost:8080/api/auth/login", {
                 email: loginForm.email,
-                senha: loginForm.senha // Usando 'senha' para consistência
+                senha: loginForm.senha
             });
 
             const token = response.data.token;
             if (token) {
                 localStorage.setItem("userToken", token);
                 alert("Login bem-sucedido!");
-                navigate("/dashboard"); // Navega para uma página de dashboard, por exemplo
+                navigate("/dashboard");
             }
         } catch (error) {
             const errorMessage = error.response?.data || "Verifique suas credenciais.";
@@ -105,26 +166,41 @@ function Login() {
                     <h2 className={`${Styles.segundo_titulo} ${Styles.titulo}`}>Crie sua conta</h2>
                     <div className={Styles.social_media}>
                         <a href="#"><i className="fi fi-brands-google"></i></a>
-                        <a href="#"><i className="fi fi-brands-instagram"></i></a>
+                        <a href="#"><i className="fi fi-brands-linkedin"></i></a>
                         <a href="#"><i className="fi fi-brands-github"></i></a>
                     </div>
                     <form className={Styles.form} onSubmit={handleRegisterSubmit}>
-                        <label>
+                        <label className={Styles.input_group}>
                             <i className="far fa-user icon-modify"></i>
                             <input type="text" name="nomeCompleto" placeholder="Digite seu nome completo" value={form.nomeCompleto} onChange={handleChange} required />
                         </label>
-                        <label>
+                        <label className={Styles.input_group}>
                             <i className="fi fi-br-at icon-modify"></i>
                             <input type="text" name="nomeUsuario" placeholder="Digite o nome de usuário" value={form.nomeUsuario} onChange={handleChange} required />
                         </label>
-                        <label>
+                        <label className={Styles.input_group}>
                             <i className="fi fi-rr-envelope icon-modify"></i>
                             <input type="email" name="email" placeholder="Digite seu Email" value={form.email} onChange={handleChange} required />
                         </label>
-                        <label>
+                        <label className={Styles.input_group}>
                             <i className="fi fi-sr-lock icon-modify"></i>
                             <input type="password" name="senha" placeholder="Digite sua senha" value={form.senha} onChange={handleChange} required />
                         </label>
+                        
+                        {/* --- NOVA MENSAGEM DE FEEDBACK DA SENHA --- */}
+                        {passwordError && (
+                            <p style={{
+                                width: '100%',
+                                textAlign: 'left',
+                                color: isPasswordValid ? 'green' : '#e74c3c', // Verde se for válida, vermelho se não
+                                fontSize: '0.8rem',
+                                marginTop: '5px',
+                                paddingLeft: '5px'
+                            }}>
+                                {passwordError}
+                            </p>
+                        )}
+
                         <div className={Styles.terms_container}>
                             <input className={Styles.input_terms} type="checkbox" name="terms" id="terms" required />
                             <label className={Styles.label_terms} htmlFor="terms">
@@ -153,19 +229,19 @@ function Login() {
                     <h2 className={`${Styles.segundo_titulo} ${Styles.titulo}`}>Entrar na sua conta</h2>
                     <div className={Styles.social_media}>
                         <a href="#"><i className="fi fi-brands-google"></i></a>
-                        <a href="#"><i className="fi fi-brands-instagram"></i></a>
+                        <a href="#"><i className="fi fi-brands-linkedin"></i></a>
                         <a href="#"><i className="fi fi-brands-github"></i></a>
                     </div>
                     <form className={Styles.form} onSubmit={handleLoginSubmit}>
-                        <label>
+                        <label className={Styles.input_group}>
                             <i className="far fa-user icon-modify"></i>
                             <input type="email" name="email" placeholder="Digite seu email" value={loginForm.email} onChange={handleLoginChange} required />
                         </label>
-                        <label>
+                        <label className={Styles.input_group}>
                             <i className="fi fi-sr-lock icon-modify"></i>
                             <input type="password" name="senha" placeholder="Digite sua senha" value={loginForm.senha} onChange={handleLoginChange} required />
                         </label>
-                        <Link to="/esqueci-a-senha" className={Styles.password}>Esqueceu a senha?</Link>
+                        <Link to="/esqueci-a-senha" className={`${Styles.password} ${Styles.back_link}`}>Esqueceu a senha?</Link>
                         <button type="submit" className={`${Styles.segundo_botao} ${Styles.botao}`}>Entrar</button>
                     </form>
                 </div>

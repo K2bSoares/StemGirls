@@ -207,19 +207,12 @@
     margin: 0 0 20px;
 }
 
-.segunda_coluna form input {
-    flex: 1;
-    border: none;
-    outline: none;
-    background-color: transparent;
-    font-size: 1rem;
-    font-family: 'Quicksand-Regular';
-    color: #333;
-    padding: 0 10px;
-}
+/* =================================================================== */
+/* --- ESTILOS REUTILIZÁVEIS PARA INPUTS (CÓDIGO ALTERADO) --- */
+/* =================================================================== */
 
-/* Estilo para os LABELS que são caixas de texto */
-.segunda_coluna form label:not(.label_terms) {
+/* Usamos uma classe genérica '.input_group' para o <label> que envolve o ícone e o input */
+.input_group {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -231,17 +224,31 @@
     border-radius: 15px;
     color: #81868b;
     font-size: 1rem;
-    margin: 10px;
+    margin: 10px 0; /* Ajustado para não ter margem lateral */
     transition: border-color 0.3s ease;
 }
 
-/* Efeito de foco para os LABELS que são caixas de texto */
-.segunda_coluna form label:not(.label_terms):focus-within {
-    border-color: #f36ec0; 
+/* Efeito de foco para o grupo */
+.input_group:focus-within {
+    border-color: #f36ec0;
 }
 
-.segunda_coluna form label i {
-    margin: 10px;
+/* Estilo para o ícone dentro do grupo */
+.input_group i {
+    margin: 0 10px 0 15px; /* Ajuste para alinhar o ícone */
+}
+
+/* Estilo para o input dentro do grupo */
+.input_group input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 1rem;
+    font-family: 'Quicksand-Regular';
+    color: #333;
+    padding-right: 15px;
 }
 
 .form input::placeholder {
@@ -268,6 +275,7 @@
     transition: background-color .5s;
     border: 3px solid #f36ec0;
     box-sizing: border-box;
+    margin-top: 10px;
 }
 
 .segundo_botao:hover {
@@ -296,6 +304,7 @@
     text-align: center;
     color: #81868b;
     font-size: 1rem;
+    text-decoration: none;
 }
 
 .password{

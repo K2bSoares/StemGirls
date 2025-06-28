@@ -13,6 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+// DTO para a requisição de redefinição de senha
+record ResetPasswordRequest(String newPassword) {}
+
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -39,13 +42,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // --- LOG DE DEBUG ADICIONADO ---
-        System.out.println("\n--- [DEBUG] AuthController: Recebendo tentativa de login ---");
-        System.out.println("E-mail recebido do Frontend: " + loginRequest.email());
-        System.out.println("Senha recebida do Frontend: " + loginRequest.senha());
-        System.out.println("----------------------------------------------------------\n");
-        // --- FIM DO LOG ---
-
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.senha())
@@ -57,8 +53,31 @@ public class AuthController {
             return ResponseEntity.ok(new JwtResponse(jwt));
 
         } catch (Exception e) {
-            System.err.println("!!! [DEBUG] Erro de autenticação: " + e.getMessage());
             return ResponseEntity.status(401).body("Erro: E-mail ou senha inválidos.");
+        }
+    }
+
+    // --- ENDPOINT PARA "ESQUECI A SENHA" ---
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody LoginRequest emailRequest) {
+        try {
+            // Reutilizamos o LoginRequest pois ele já tem o campo 'email'
+            authService.processForgotPassword(emailRequest.email());
+            return ResponseEntity.ok("Se o e-mail existir em nossa base, um link de redefinição foi enviado.");
+        } catch (Exception e) {
+            // Em caso de erro no envio do e-mail, por exemplo
+            return ResponseEntity.status(500).body("Erro ao processar a solicitação: " + e.getMessage());
+        }
+    }
+
+    // --- ENDPOINT PARA REDEFINIR A SENHA ---
+    @PostMapping("/reset-password/{token}")
+    public ResponseEntity<String> resetPassword(@PathVariable String token, @RequestBody ResetPasswordRequest passwordRequest) {
+        try {
+            authService.processResetPassword(token, passwordRequest.newPassword());
+            return ResponseEntity.ok("Senha redefinida com sucesso!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

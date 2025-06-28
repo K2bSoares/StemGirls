@@ -11,7 +11,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Service
 public class AuthService implements UserDetailsService {
@@ -21,6 +23,9 @@ public class AuthService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
 
     public UsuarioModel registerUser(SignUpRequest signUpRequest) {
         if (usuarioRepository.existsByEmail(signUpRequest.email())) {
@@ -34,21 +39,46 @@ public class AuthService implements UserDetailsService {
         return usuarioRepository.save(newUser);
     }
 
+    public void processForgotPassword(String email) {
+        // Busca o usuário pelo e-mail. Se existir, executa a lógica.
+        usuarioRepository.findByEmail(email).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            user.setPasswordResetToken(token);
+            user.setPasswordResetTokenExpiryDate(LocalDateTime.now().plusHours(1)); // Token válido por 1 hora
+            usuarioRepository.save(user);
+
+            // Chama o serviço de e-mail para enviar o link com o token
+            emailService.sendPasswordResetEmail(user.getEmail(), token);
+        });
+        // Nota: Propositalmente não retornamos erro se o e-mail não existir,
+        // para não expor quais e-mails estão cadastrados no sistema (prática de segurança).
+    }
+
+    public void processResetPassword(String token, String newPassword) {
+        // Busca o usuário pelo token
+        UsuarioModel user = usuarioRepository.findByPasswordResetToken(token)
+                .orElseThrow(() -> new RuntimeException("Token de redefinição inválido ou expirado."));
+
+        // Verifica se o token expirou
+        if (user.getPasswordResetTokenExpiryDate().isBefore(LocalDateTime.now())) {
+            // Limpa o token para segurança e lança o erro
+            user.setPasswordResetToken(null);
+            user.setPasswordResetTokenExpiryDate(null);
+            usuarioRepository.save(user);
+            throw new RuntimeException("Token de redefinição expirado.");
+        }
+
+        // Se o token for válido, atualiza a senha e limpa os campos do token
+        user.setSenha(passwordEncoder.encode(newPassword));
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiryDate(null);
+        usuarioRepository.save(user);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // --- LOG DE DEBUG ADICIONADO ---
-        System.out.println("\n--- [DEBUG] AuthService (loadUserByUsername): Buscando usuário ---");
-        System.out.println("Spring Security pediu para buscar o usuário com e-mail: " + email);
-        // --- FIM DO LOG ---
-
         UsuarioModel user = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o e-mail: " + email));
-
-        // --- LOG DE DEBUG ADICIONADO ---
-        System.out.println("Usuário encontrado no banco de dados: " + user.getEmail());
-        System.out.println("Hash da senha no banco: " + user.getSenha());
-        System.out.println("----------------------------------------------------------------\n");
-        // --- FIM DO LOG ---
 
         return new User(user.getEmail(), user.getSenha(), new ArrayList<>());
     }

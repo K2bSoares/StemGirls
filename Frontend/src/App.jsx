@@ -2,13 +2,15 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./componentes/Login.jsx"; // Adicione .jsx
 import ForgotPasswordPage from "./componentes/ForgotPasswordPage.jsx"; // Adicione .jsx
 import ResetPasswordPage from "./componentes/ResetPasswordPage.jsx"; // Adicione .jsx
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import "./App.css";
 
 // ... resto do seu componente App
 
 function App() {
   return (
-    // O componente <Routes> funciona como um contêiner para todas as suas rotas.
+    <GoogleOAuthProvider clientId="179230958964-5hk3dhg87p16157k6im78eu54j5k1bv6.apps.googleusercontent.com">
+    {/* O componente <Routes> funciona como um contêiner para todas as suas rotas. */}
     <Routes>
       
       {/* Rota para a página de Login. Será exibida na raiz "/" e em "/login" */}
@@ -24,6 +26,7 @@ function App() {
       {/* Você pode adicionar outras rotas do seu aplicativo aqui */}
 
     </Routes>
+    </GoogleOAuthProvider>
   );
 }
 

@@ -2,6 +2,7 @@ import Styles from '../css/Login.module.css';
 import LogoSG from '../assets/img/LogoSG.png';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 
 function Login() {
@@ -164,11 +165,11 @@ function Login() {
                 </div>
                 <div className={Styles.segunda_coluna}>
                     <h2 className={`${Styles.segundo_titulo} ${Styles.titulo}`}>Crie sua conta</h2>
-                    <div className={Styles.social_media}>
+                    {/* <div className={Styles.social_media}>
                         <a href="#"><i className="fi fi-brands-google"></i></a>
                         <a href="#"><i className="fi fi-brands-linkedin"></i></a>
                         <a href="#"><i className="fi fi-brands-github"></i></a>
-                    </div>
+                    </div> */}
                     <form className={Styles.form} onSubmit={handleRegisterSubmit}>
                         <label className={Styles.input_group}>
                             <i className="far fa-user icon-modify"></i>
@@ -186,7 +187,7 @@ function Login() {
                             <i className="fi fi-sr-lock icon-modify"></i>
                             <input type="password" name="senha" placeholder="Digite sua senha" value={form.senha} onChange={handleChange} required />
                         </label>
-                        
+
                         {/* --- NOVA MENSAGEM DE FEEDBACK DA SENHA --- */}
                         {passwordError && (
                             <p style={{
@@ -228,9 +229,9 @@ function Login() {
                 <div className={Styles.segunda_coluna}>
                     <h2 className={`${Styles.segundo_titulo} ${Styles.titulo}`}>Entrar na sua conta</h2>
                     <div className={Styles.social_media}>
-                        <a href="#"><i className="fi fi-brands-google"></i></a>
+                        {/* <a href="#"><i className="fi fi-brands-google"></i></a>
                         <a href="#"><i className="fi fi-brands-linkedin"></i></a>
-                        <a href="#"><i className="fi fi-brands-github"></i></a>
+                        <a href="#"><i className="fi fi-brands-github"></i></a> */}
                     </div>
                     <form className={Styles.form} onSubmit={handleLoginSubmit}>
                         <label className={Styles.input_group}>
@@ -241,6 +242,16 @@ function Login() {
                             <i className="fi fi-sr-lock icon-modify"></i>
                             <input type="password" name="senha" placeholder="Digite sua senha" value={loginForm.senha} onChange={handleLoginChange} required />
                         </label>
+
+                        <GoogleLogin
+                            onSuccess={credentialResponse => {
+                                console.log("Login com o Google bem-sucedido!");
+                                console.log(credentialResponse);
+                            }}
+                            onError={() => {
+                                console.log('Erro no login com o Google');
+                            }}
+                        />
                         <Link to="/esqueci-a-senha" className={`${Styles.password} ${Styles.back_link}`}>Esqueceu a senha?</Link>
                         <button type="submit" className={`${Styles.segundo_botao} ${Styles.botao}`}>Entrar</button>
                     </form>

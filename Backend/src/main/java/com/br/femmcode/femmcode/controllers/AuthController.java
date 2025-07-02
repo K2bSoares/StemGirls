@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 // DTO para a requisição de redefinição de senha
 record ResetPasswordRequest(String newPassword) {}
 
+
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:5173")
